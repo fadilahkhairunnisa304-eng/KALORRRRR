@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="id" class="h-full bg-slate-900 text-slate-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebAR Kalor & Asas Black - Fisika SMA Kelas X</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Three.js Library CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Three.js OrbitControls CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+        
+        /* Custom scrollbar styling */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); }
+        ::-webkit-scrollbar-thumb { background: rgba(51, 65, 85, 0.8); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(71, 85, 105, 1); }
+        
+        /* Glassmorphism styling */
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .glass-card {
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        /* Print-specific layout optimization */
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white !important; color: black !important; }
+            .print-full { width: 100% !important; max-width: 100% !important; overflow: visible !important; }
+            .glass-panel, .glass-card { background: white !important; border: 1px solid #cbd5e1 !important; color: black !important; backdrop-filter: none !important; }
+            input, select, textarea { border: 1px solid #94a3b8 !important; color: black !important; background: white !important; }
+            .text-slate-100, .text-slate-200, .text-slate-300, .text-slate-400 { color: #1e293b !important; }
+            .text-cyan-400, .text-amber-400, .text-rose-400, .text-emerald-400 { color: #0f172a !important; font-weight: bold !important; }
+        }
+    </style>
+</head>
+<body class="h-full flex flex-col overflow-x-hidden">
+
+    <!-- Header Navigation Bar -->
+    <header class="glass-panel border-b border-slate-700/50 px-4 py-3 sticky top-0 z-50 flex items-center justify-between no-print">
+        <div class="flex items-center space-x-3">
+            <div class="bg-gradient-to-tr from-amber-500 to-rose-600 p-2.5 rounded-xl shadow-lg shadow-rose-500/20">
+                <i class="fa-solid fa-fire-flame-curved text-white text-xl"></i>
+            </div>
+            <div>
+                <h1 class="font-bold text-lg leading-tight bg-gradient-to-r from-amber-400 via-rose-300 to-cyan-300 bg-clip-text text-transparent">
+                    WebAR Fisika: Konsep Kalor & Asas Black
+                </h1>
+                <p class="text-xs text-slate-400">Fisika SMA Kelas X • Kurikulum Merdeka (Pendekatan Deep Learning)</p>
+            </div>
+        </div>
+        <div class="flex items-center space-x-2">
+            <button onclick="window.print()" class="px-3.5 py-1.5 text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl border border-slate-600 transition flex items-center space-x-2 shadow-md">
+                <i class="fa-solid fa-print text-amber-400"></i>
+                <span class="hidden sm:inline">Cetak / Simpan PDF LKPD</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content Workspace (Split Screen Layout) -->
+    <main class="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-4 p-3 md:p-4 max-w-[1920px] mx-auto w-full">
+        
+        <!-- LEFT COLUMN: LKPD Interaktif (6 cols desktop) -->
+        <section class="lg:col-span-6 flex flex-col space-y-4 overflow-y-auto pr-0 lg:pr-2 print-full" id="lkpd-section">
+            
+            <!-- Identitas Siswa -->
+            <div class="glass-panel rounded-2xl p-4 shadow-xl">
+                <h2 class="text-xs font-bold uppercase tracking-wider text-amber-400 mb-3 flex items-center">
+                    <i class="fa-solid fa-id-card mr-2"></i> Identitas Peserta Didik
+                </h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-300 mb-1">Nama / Kelompok:</label>
+                        <input type="text" id="student-name" placeholder="Masukkan nama/kelompok..." class="w-full bg-slate-900/80 border border-slate-700 rounded-xl px-3 py-1.5 text-xs focus:outline-none focus:border-amber-500 text-slate-100 transition">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-300 mb-1">Kelas / Semester:</label>
+                        <input type="text" id="student-class" value="X / Ganjil" class="w-full bg-slate-900/80 border border-slate-700 rounded-xl px-3 py-1.5 text-xs focus:outline-none focus:border-amber-500 text-slate-100 transition">
+                    </div>
+                </div>
+            </div>
+
+            <!-- FASE 1: MEMAHAMI (Orientasi Masalah & Tujuan) -->
+            <div class="glass-panel rounded-2xl p-5 shadow-xl border-l-4 border-l-amber-500">
+                <div class="flex items-center space-x-2 mb-3">
+                    <span class="bg-amber-500/20 text-amber-400 text-xs font-bold px-2.5 py-1 rounded-full border border-amber-500/30">FASE 1</span>
+                    <h3 class="font-bold text-base text-slate-100">Memahami (Orientasi Masalah)</h3>
+                </div>
+                
+                <div class="space-y-3 text-xs leading-relaxed">
+                    <div class="bg-slate-900/60 rounded-xl p-3.5 border border-slate-800">
+                        <h4 class="font-semibold text-amber-300 mb-1.5 flex items-center text-xs uppercase tracking-wide">
+                            <i class="fa-solid fa-bullseye mr-1.5"></i> Tujuan Pembelajaran:
+                        </h4>
+                        <ul class="list-disc list-inside space-y-1 text-slate-300">
+                            <li>Menganalisis besarnya energi kalor yang diserap atau dilepaskan suatu benda (<span class="font-mono text-amber-300">Q = m · c · ΔT</span>).</li>
+                            <li>Membuktikan Asas Black pada interaksi pertukaran kalor antara dua benda (<span class="font-mono text-cyan-300">Q_lepas = Q_terima</span>) menuju kesetimbangan termal.</li>
+                            <li>Mengamati perubahan wujud dan transfer energi termal secara visual interaktif menggunakan simulasi 3D dan WebAR.</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-slate-800/40 rounded-xl p-3.5 border border-slate-700/50">
+                        <h4 class="font-semibold text-rose-300 mb-1.5 flex items-center text-xs uppercase tracking-wide">
+                            <i class="fa-solid fa-lightbulb mr-1.5"></i> Wacana Orientasi Masalah:
+                        </h4>
+                        <p class="text-slate-300 text-justify">
+                            Pernahkah Anda membuat mandi air hangat dengan mencampurkan air mendidih dari ketel ke dalam ember berisi air dingin? Mengapa air mendidih berubah menjadi tidak terlalu panas, sedangkan air dingin menjadi hangat? Ke mana perginya kalor dari air panas tersebut? Apakah jumlah kalor yang dilepaskan air panas persis sama dengan yang diterima air dingin? Mari kita selidiki secara kuantitatif melalui simulasi WebAR interaktif di sebelah kanan!
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FASE 2: MENGAPLIKASI (Simulasi, Kontrol & Data Logger) -->
+            <div class="glass-panel rounded-2xl p-5 shadow-xl border-l-4 border-l-cyan-500">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center space-x-2">
+                        <span class="bg-cyan-500/20 text-cyan-400 text-xs font-bold px-2.5 py-1 rounded-full border border-cyan-500/30">FASE 2</span>
+                        <h3 class="font-bold text-base text-slate-100">Mengaplikasi (Eksperimen Virtual)</h3>
+                    </div>
+                    <span class="text-xs text-slate-400 no-print"><i class="fa-solid fa-sliders mr-1"></i> Control Panel</span>
+                </div>
+
+                <!-- Simulation Mode Switcher -->
+                <div class="mb-4 no-print">
+                    <label class="block text-xs font-semibold text-slate-300 mb-1.5">Pilih Modul Simulasi:</label>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button id="btn-mode-single" onclick="setSimMode('single')" class="px-3 py-2 rounded-xl text-xs font-semibold border transition flex items-center justify-center space-x-2 bg-amber-500 text-slate-950 border-amber-400 shadow-lg shadow-amber-500/20">
+                            <i class="fa-solid fa-fire"></i>
+                            <span>1. Pemanasan Benda Tunggal</span>
+                        </button>
+                        <button id="btn-mode-mix" onclick="setSimMode('mix')" class="px-3 py-2 rounded-xl text-xs font-semibold border border-slate-700 bg-slate-800 text-slate-300 hover:text-white transition flex items-center justify-center space-x-2">
+                            <i class="fa-solid fa-arrows-split-up-and-left"></i>
+                            <span>2. Asas Black (Pencampuran)</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Presets Quick Buttons -->
+                <div class="mb-4 no-print">
+                    <label class="block text-xs font-medium text-slate-400 mb-1">Skenario Cepat (Presets):</label>
+                    <div class="flex flex-wrap gap-1.5">
+                        <button onclick="applyPreset('water_heat')" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-amber-300 rounded-lg text-xs border border-amber-500/30 transition">Pemanasan Air</button>
+                        <button onclick="applyPreset('mix_water')" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-cyan-300 rounded-lg text-xs border border-cyan-500/30 transition">Air Panas + Air Dingin</button>
+                        <button onclick="applyPreset('metal_water')" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-rose-300 rounded-lg text-xs border border-rose-500/30 transition">Tembaga Panas + Air</button>
+                    </div>
+                </div>
+
+                <!-- Parameters Controls Panel -->
+                <div class="glass-card p-4 rounded-xl mb-4 space-y-4 no-print border border-slate-700">
+                    
+                    <!-- OBJECT A CONTROLS -->
+                    <div class="p-3 bg-slate-900/80 rounded-xl border border-amber-500/30 space-y-3">
+                        <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                            <span class="text-xs font-bold text-amber-400 flex items-center">
+                                <i class="fa-solid fa-cube mr-1.5"></i> Benda A <span id="label-obj-a-role" class="ml-2 text-[10px] bg-amber-500/20 px-2 py-0.5 rounded text-amber-300">(Objek Uji)</span>
+                            </span>
+                            <span id="obj-a-c-val" class="font-mono text-[11px] text-slate-400">c = 4184 J/kg°C</span>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-[11px] text-slate-300 mb-1">Bahan Benda A:</label>
+                                <select id="mat-a" onchange="updatePhysicsCalculations()" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-amber-500">
+                                    <option value="water">Air (c = 4184 J/kg°C)</option>
+                                    <option value="aluminum">Aluminium (c = 900 J/kg°C)</option>
+                                    <option value="copper">Tembaga (c = 386 J/kg°C)</option>
+                                    <option value="iron">Besi (c = 450 J/kg°C)</option>
+                                    <option value="ice">Es (c = 2100 J/kg°C)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[11px] text-slate-300 mb-1">Massa m_A: <span id="disp-mass-a" class="font-mono font-bold text-amber-400">1.0 kg</span></label>
+                                <input type="range" id="mass-a" min="0.1" max="5.0" step="0.1" value="1.0" oninput="updatePhysicsCalculations()" class="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-amber-400">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-[11px] text-slate-300 mb-1">Suhu Awal T_awal_A: <span id="disp-temp-a" class="font-mono font-bold text-amber-400">25.0 °C</span></label>
+                                <input type="range" id="temp-a" min="-10" max="100" step="1" value="25" oninput="updatePhysicsCalculations()" class="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-amber-400">
+                            </div>
+                            <div id="container-target-temp">
+                                <label class="block text-[11px] text-slate-300 mb-1">Suhu Akhir T_akhir_A: <span id="disp-temp-a-target" class="font-mono font-bold text-rose-400">75.0 °C</span></label>
+                                <input type="range" id="temp-a-target" min="-10" max="100" step="1" value="75" oninput="updatePhysicsCalculations()" class="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-rose-400">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- OBJECT B CONTROLS (Active in Mix / Asas Black Mode) -->
+                    <div id="panel-obj-b" class="p-3 bg-slate-900/80 rounded-xl border border-cyan-500/30 space-y-3 hidden">
+                        <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                            <span class="text-xs font-bold text-cyan-400 flex items-center">
+                                <i class="fa-solid fa-cube mr-1.5"></i> Benda B <span class="ml-2 text-[10px] bg-cyan-500/20 px-2 py-0.5 rounded text-cyan-300">(Pencampur)</span>
+                            </span>
+                            <span id="obj-b-c-val" class="font-mono text-[11px] text-slate-400">c = 4184 J/kg°C</span>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-[11px] text-slate-300 mb-1">Bahan Benda B:</label>
+                                <select id="mat-b" onchange="updatePhysicsCalculations()" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-cyan-500">
+                                    <option value="water">Air (c = 4184 J/kg°C)</option>
+                                    <option value="aluminum">Aluminium (c = 900 J/kg°C)</option>
+                                    <option value="copper" selected>Tembaga (c = 386 J/kg°C)</option>
+                                    <option value="iron">Besi (c = 450 J/kg°C)</option>
+                                    <option value="ice">Es (c = 2100 J/kg°C)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[11px] text-slate-300 mb-1">Massa m_B: <span id="disp-mass-b" class="font-mono font-bold text-cyan-400">0.5 kg</span></label>
+                                <input type="range" id="mass-b" min="0.1" max="5.0" step="0.1" value="0.5" oninput="updatePhysicsCalculations()" class="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-400">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-[11px] text-slate-300 mb-1">Suhu Awal T_awal_B: <span id="disp-temp-b" class="font-mono font-bold text-cyan-400">80.0 °C</span></label>
+                            <input type="range" id="temp-b" min="-10" max="100" step="1" value="80" oninput="updatePhysicsCalculations()" class="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-400">
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Live Mathematical Calculation Output Cards -->
+                <div class="mb-4 space-y-2">
+                    <h4 class="text-xs font-semibold text-slate-300 flex items-center">
+                        <i class="fa-solid fa-calculator text-cyan-400 mr-1.5"></i> Hasil Kalkulasi Fisika Real-Time:
+                    </h4>
+                    
+                    <div id="output-single-mode" class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                        <div class="bg-slate-900/80 border border-slate-800 p-2.5 rounded-xl text-center">
+                            <span class="text-[10px] text-slate-400 block uppercase">Perubahan Suhu (ΔT)</span>
+                            <span id="calc-delta-t" class="font-mono text-base font-bold text-amber-400">50.0 °C</span>
+                        </div>
+                        <div class="bg-slate-900/80 border border-slate-800 p-2.5 rounded-xl text-center">
+                            <span class="text-[10px] text-slate-400 block uppercase">Jumlah Kalor (Q)</span>
+                            <span id="calc-q-joule" class="font-mono text-base font-bold text-rose-400">209.20 kJ</span>
+                        </div>
+                        <div class="bg-slate-900/80 border border-slate-800 p-2.5 rounded-xl text-center col-span-2 sm:col-span-1">
+                            <span class="text-[10px] text-slate-400 block uppercase">Status Termal</span>
+                            <span id="calc-status-single" class="font-mono text-xs font-bold text-emerald-400">Menerima Kalor</span>
+                        </div>
+                    </div>
+
+                    <div id="output-mix-mode" class="grid grid-cols-2 sm:grid-cols-3 gap-2 hidden">
+                        <div class="bg-slate-900/80 border border-slate-800 p-2.5 rounded-xl text-center col-span-2 sm:col-span-1">
+                            <span class="text-[10px] text-slate-400 block uppercase">Suhu Akhir Termal (Tc)</span>
+                            <span id="calc-tc-mix" class="font-mono text-lg font-bold text-emerald-400">31.85 °C</span>
+                        </div>
+                        <div class="bg-slate-900/80 border border-slate-800 p-2.5 rounded-xl text-center">
+                            <span class="text-[10px] text-slate-400 block uppercase">Kalor Dilepas (Q_lepas)</span>
+                            <span id="calc-q-released" class="font-mono text-xs font-bold text-rose-400">9.30 kJ</span>
+                        </div>
+                        <div class="bg-slate-900/80 border border-slate-800 p-2.5 rounded-xl text-center">
+                            <span class="text-[10px] text-slate-400 block uppercase">Kalor Diterima (Q_terima)</span>
+                            <span id="calc-q-absorbed" class="font-mono text-xs font-bold text-cyan-400">9.30 kJ</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Add to Data Table Action -->
+                <div class="flex justify-between items-center mb-3 no-print">
+                    <span class="text-xs text-slate-400">Rekam parameter ke tabel pengamatan:</span>
+                    <button onclick="recordCurrentStateToTable()" class="px-3 py-1.5 bg-gradient-to-r from-amber-500 to-rose-600 hover:from-amber-400 hover:to-rose-500 text-white rounded-xl text-xs font-bold shadow-lg shadow-amber-500/20 transition flex items-center space-x-1.5">
+                        <i class="fa-solid fa-plus"></i>
+                        <span>Catat Hasil ke Tabel</span>
+                    </button>
+                </div>
+
+                <!-- Interactive Data Table -->
+                <div class="overflow-x-auto rounded-xl border border-slate-800 bg-slate-900/60">
+                    <table class="w-full text-xs text-left text-slate-300">
+                        <thead class="bg-slate-800/80 text-slate-300 uppercase text-[10px] tracking-wider border-b border-slate-700">
+                            <tr>
+                                <th class="px-2.5 py-2">No</th>
+                                <th class="px-2.5 py-2">Modul</th>
+                                <th class="px-2.5 py-2">Bahan (A/B)</th>
+                                <th class="px-2.5 py-2">Massa (kg)</th>
+                                <th class="px-2.5 py-2">T_awal (°C)</th>
+                                <th class="px-2.5 py-2">Hasil (Tc / ΔT)</th>
+                                <th class="px-2.5 py-2">Kalor Q (kJ)</th>
+                                <th class="px-2 py-2 text-center no-print">Hapus</th>
+                            </tr>
+                        </thead>
+                        <tbody id="data-table-body" class="divide-y divide-slate-800/60 font-mono text-[11px]">
+                            <!-- Dynamic rows appended here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- FASE 3: MEREFLEKSI (Pertanyaan Analisis HOTS & Kesimpulan) -->
+            <div class="glass-panel rounded-2xl p-5 shadow-xl border-l-4 border-l-rose-500 space-y-4">
+                <div class="flex items-center space-x-2">
+                    <span class="bg-rose-500/20 text-rose-400 text-xs font-bold px-2.5 py-1 rounded-full border border-rose-500/30">FASE 3</span>
+                    <h3 class="font-bold text-base text-slate-100">Merefleksi & Analisis HOTS</h3>
+                </div>
+
+                <div class="space-y-4 text-xs">
+                    <div>
+                        <label class="block font-semibold text-slate-200 mb-1.5">
+                            1. Berdasarkan simulasi Asas Black, mengapa logam tembaga bersuhu tinggi ($80^\circ\text{C}$) ketika dimasukkan ke dalam air dingin tidak menaikkan suhu air secara drastis dibandingkan jika yang dicampurkan adalah air panas? Hubungkan dengan nilai kalor jenis ($c$)!
+                        </label>
+                        <textarea rows="3" placeholder="Tuliskan jawaban analisis Anda mengenai pengaruh kalor jenis benda..." class="w-full bg-slate-900/80 border border-slate-700 rounded-xl p-2.5 text-slate-200 focus:outline-none focus:border-rose-500 transition"></textarea>
+                    </div>
+
+                    <div>
+                        <label class="block font-semibold text-slate-200 mb-1.5">
+                            2. Pada eksperimen di laboratorium nyata, hasil suhu akhir pencampuran ($T_c$) seringkali sedikit lebih rendah dibanding hasil perhitungan rumus Asas Black secara teoritis. Mengapa demikian? Faktor lingkungan apa yang memengaruhinya?
+                        </label>
+                        <textarea rows="3" placeholder="Jelaskan mengenai kehilangan kalor ke kalori meter atau udara luar..." class="w-full bg-slate-900/80 border border-slate-700 rounded-xl p-2.5 text-slate-200 focus:outline-none focus:border-rose-500 transition"></textarea>
+                    </div>
+
+                    <div>
+                        <label class="block font-semibold text-slate-200 mb-1.5">
+                            3. Kesimpulan Pembelajaran:
+                        </label>
+                        <textarea rows="3" placeholder="Tuliskan kesimpulan menyeluruh mengenai hubungan antara massa, kalor jenis, perubahan suhu, dan Asas Black..." class="w-full bg-slate-900/80 border border-slate-700 rounded-xl p-2.5 text-slate-200 focus:outline-none focus:border-rose-500 transition"></textarea>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- RIGHT COLUMN: 3D & WebAR Visualizer Canvas (6 cols desktop) -->
+        <section class="lg:col-span-6 flex flex-col space-y-3 no-print">
+            <div class="glass-panel rounded-2xl p-3 flex-1 flex flex-col relative overflow-hidden min-h-[520px] lg:min-h-[680px] shadow-2xl border border-slate-700/60">
+                
+                <!-- Canvas Top Overlay Control Bar -->
+                <div class="flex flex-wrap items-center justify-between gap-2 bg-slate-900/80 p-2.5 rounded-xl border border-slate-800 z-10 backdrop-blur-md">
+                    <div class="flex items-center space-x-2">
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                            <span class="w-2 h-2 rounded-full bg-amber-400 mr-1.5 animate-pulse"></span>
+                            3D Heat Transfer Engine
+                        </span>
+                    </div>
+
+                    <!-- Mode View Switcher Buttons -->
+                    <div class="flex items-center bg-slate-800 p-1 rounded-lg border border-slate-700">
+                        <button id="btn-view-3d" onclick="switch3DViewMode('3d')" class="px-3 py-1 rounded-md text-xs font-semibold transition bg-amber-500 text-slate-950 shadow">
+                            <i class="fa-solid fa-cube mr-1"></i> Mode 3D
+                        </button>
+                        <button id="btn-view-ar" onclick="switch3DViewMode('ar')" class="px-3 py-1 rounded-md text-xs font-medium text-slate-400 hover:text-slate-200 transition">
+                            <i class="fa-solid fa-camera-retro mr-1"></i> Mode WebAR Camera
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Canvas Render Container -->
+                <div class="relative flex-1 w-full h-full rounded-xl overflow-hidden mt-2 bg-slate-950 flex items-center justify-center">
+                    
+                    <!-- AR Camera Video Stream Overlay -->
+                    <video id="ar-camera-feed" autoplay playsinline class="absolute inset-0 w-full h-full object-cover hidden z-0"></video>
+
+                    <!-- Three.js Canvas Container -->
+                    <div id="three-render-area" class="absolute inset-0 w-full h-full z-10"></div>
+
+                    <!-- Floating Thermal Status Overlay Box -->
+                    <div class="absolute top-4 left-4 z-20 pointer-events-none">
+                        <div class="glass-panel p-3 rounded-xl border border-amber-500/30 shadow-xl text-slate-100 space-y-1 max-w-[220px]">
+                            <div class="text-[10px] uppercase font-bold text-amber-400 tracking-wider">Visualisasi Suhu 3D</div>
+                            <div id="status-mode-label" class="text-xs font-bold text-slate-200">Mode Pemanasan</div>
+                            
+                            <div class="text-xs text-slate-300 font-mono space-y-0.5 pt-1">
+                                <div>Benda A: <span id="disp-3d-temp-a" class="font-bold text-amber-400">25 °C</span></div>
+                                <div id="disp-3d-temp-b-row" class="hidden">Benda B: <span id="disp-3d-temp-b" class="font-bold text-cyan-400">80 °C</span></div>
+                            </div>
+                            
+                            <div id="status-heat-flow" class="text-[10px] text-emerald-400 flex items-center pt-1 border-t border-slate-800 mt-1">
+                                <i class="fa-solid fa-fire mr-1"></i> Pemanasan Aktif
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- AR Camera Guidance Note -->
+                    <div id="ar-guide-banner" class="hidden absolute bottom-4 left-1/2 transform -translate-x-1/2 z-20 bg-slate-900/90 border border-amber-500/40 text-amber-200 px-4 py-2 rounded-xl text-xs backdrop-blur-md shadow-2xl flex items-center space-x-2 max-w-[90%] text-center">
+                        <i class="fa-solid fa-circle-info text-amber-400 text-base"></i>
+                        <span>WebAR Markerless Aktif! Arahkan kamera ke meja atau permukaan datar tempat eksperimen diletakkan.</span>
+                    </div>
+
+                    <!-- Interactive Gesture Controls Tip -->
+                    <div class="absolute bottom-3 right-3 z-20 pointer-events-none hidden sm:block">
+                        <div class="bg-slate-900/70 backdrop-blur text-[10px] text-slate-400 px-2.5 py-1.5 rounded-lg border border-slate-800 flex items-center space-x-2">
+                            <span><i class="fa-solid fa-hand-pointer mr-1"></i> Rotasi / Zoom: Drag & Scroll Mouse</span>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- 3D Physics Legend -->
+                <div class="mt-2 grid grid-cols-3 gap-2 text-center text-xs">
+                    <div class="bg-slate-900/70 p-2 rounded-lg border border-slate-800">
+                        <div class="text-[10px] text-slate-400">Warna Benda A</div>
+                        <div id="legend-color-a" class="font-bold text-amber-400">Suhu Ruang</div>
+                    </div>
+                    <div class="bg-slate-900/70 p-2 rounded-lg border border-slate-800">
+                        <div class="text-[10px] text-slate-400">Warna Benda B</div>
+                        <div id="legend-color-b" class="font-bold text-slate-500">- (Matikan)</div>
+                    </div>
+                    <div class="bg-slate-900/70 p-2 rounded-lg border border-slate-800">
+                        <div class="text-[10px] text-slate-400">Efek Termal 3D</div>
+                        <div id="legend-effect" class="font-bold text-rose-400">Api Bunsen</div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Application Logic Script -->
+    <script>
+        // --- CONSTANTS & PHYSICS SPECS ---
+        const MATERIAL_SPECS = {
+            water: { name: 'Air', c: 4184, isLiquid: true },
+            aluminum: { name: 'Aluminium', c: 900, isLiquid: false },
+            copper: { name: 'Tembaga', c: 386, isLiquid: false },
+            iron: { name: 'Besi', c: 450, isLiquid: false },
+            ice: { name: 'Es', c: 2100, isLiquid: false }
+        };
+
+        // --- GLOBAL STATE ---
+        let simMode = 'single'; // 'single' or 'mix'
+        let currentViewMode = '3d'; // '3d' or 'ar'
+        let tableRecordCount = 0;
+        let cameraStream = null;
+
+        // Three.js State Variables
+        let scene, camera, renderer, controls;
+        let meshObjA, meshObjB, beakerA, beakerB, bunsenFlame, steamParticles, heatFlowParticles;
+
+        // --- PHYSICS CALCULATIONS ---
+        function updatePhysicsCalculations() {
+            // Retrieve inputs
+            const matAKey = document.getElementById('mat-a').value;
+            const massA = parseFloat(document.getElementById('mass-a').value);
+            const tempA = parseFloat(document.getElementById('temp-a').value);
+            const tempATarget = parseFloat(document.getElementById('temp-a-target').value);
+
+            const matBKey = document.getElementById('mat-b').value;
+            const massB = parseFloat(document.getElementById('mass-b').value);
+            const tempB = parseFloat(document.getElementById('temp-b').value);
+
+            // Update Input Value Labels
+            document.getElementById('disp-mass-a').innerText = `${massA.toFixed(1)} kg`;
+            document.getElementById('disp-temp-a').innerText = `${tempA.toFixed(1)} °C`;
+            document.getElementById('disp-temp-a-target').innerText = `${tempATarget.toFixed(1)} °C`;
+            document.getElementById('obj-a-c-val').innerText = `c = ${MATERIAL_SPECS[matAKey].c} J/kg°C`;
+
+            document.getElementById('disp-mass-b').innerText = `${massB.toFixed(1)} kg`;
+            document.getElementById('disp-temp-b').innerText = `${tempB.toFixed(1)} °C`;
+            document.getElementById('obj-b-c-val').innerText = `c = ${MATERIAL_SPECS[matBKey].c} J/kg°C`;
+
+            const cA = MATERIAL_SPECS[matAKey].c;
+            const cB = MATERIAL_SPECS[matBKey].c;
+
+            if (simMode === 'single') {
+                // Mode 1: Q = m * c * deltaT
+                const deltaT = tempATarget - tempA;
+                const Q_joules = massA * cA * deltaT;
+                const Q_kj = Q_joules / 1000;
+
+                document.getElementById('calc-delta-t').innerText = `${deltaT.toFixed(1)} °C`;
+                document.getElementById('calc-q-joule').innerText = `${Q_kj.toFixed(2)} kJ`;
+
+                const statusElem = document.getElementById('calc-status-single');
+                if (deltaT > 0) {
+                    statusElem.innerText = "Menerima Kalor (+Q)";
+                    statusElem.className = "font-mono text-xs font-bold text-rose-400";
+                } else if (deltaT < 0) {
+                    statusElem.innerText = "Melepas Kalor (-Q)";
+                    statusElem.className = "font-mono text-xs font-bold text-cyan-400";
+                } else {
+                    statusElem.innerText = "Setimbang Termal (Q=0)";
+                    statusElem.className = "font-mono text-xs font-bold text-emerald-400";
+                }
+
+                // Update 3D Overlay Labels
+                document.getElementById('disp-3d-temp-a').innerText = `${tempATarget.toFixed(1)} °C`;
+                document.getElementById('status-heat-flow').innerHTML = '<i class="fa-solid fa-fire mr-1"></i> Pemanasan Bunsen Aktif';
+
+            } else {
+                // Mode 2: Asas Black Tc = (mA*cA*TA + mB*cB*TB) / (mA*cA + mB*cB)
+                const Tc = ((massA * cA * tempA) + (massB * cB * tempB)) / ((massA * cA) + (massB * cB));
+
+                // Q_lepas and Q_terima
+                let Q_lepas = 0, Q_terima = 0;
+                if (tempA > tempB) {
+                    Q_lepas = massA * cA * (tempA - Tc);
+                    Q_terima = massB * cB * (Tc - tempB);
+                } else {
+                    Q_lepas = massB * cB * (tempB - Tc);
+                    Q_terima = massA * cA * (Tc - tempA);
+                }
+
+                document.getElementById('calc-tc-mix').innerText = `${Tc.toFixed(2)} °C`;
+                document.getElementById('calc-q-released').innerText = `${(Q_lepas / 1000).toFixed(2)} kJ`;
+                document.getElementById('calc-q-absorbed').innerText = `${(Q_terima / 1000).toFixed(2)} kJ`;
+
+                // Update 3D Overlay Labels
+                document.getElementById('disp-3d-temp-a').innerText = `${tempA.toFixed(1)} °C -> ${Tc.toFixed(1)} °C`;
+                document.getElementById('disp-3d-temp-b').innerText = `${tempB.toFixed(1)} °C -> ${Tc.toFixed(1)} °C`;
+                document.getElementById('status-heat-flow').innerHTML = '<i class="fa-solid fa-arrows-split-up-and-left mr-1"></i> Pertukaran Kalor Asas Black';
+            }
+
+            // Sync Visual 3D Models
+            update3DVisuals();
+        }
+
+        // --- SIMULATION MODE CONTROLLER ---
+        function setSimMode(mode) {
+            simMode = mode;
+            const btnSingle = document.getElementById('btn-mode-single');
+            const btnMix = document.getElementById('btn-mode-mix');
+            const panelB = document.getElementById('panel-obj-b');
+            const containerTarget = document.getElementById('container-target-temp');
+            const outputSingle = document.getElementById('output-single-mode');
+            const outputMix = document.getElementById('output-mix-mode');
+            const labelRoleA = document.getElementById('label-obj-a-role');
+            const row3dTempB = document.getElementById('disp-3d-temp-b-row');
+            const statusModeLabel = document.getElementById('status-mode-label');
+
+            if (mode === 'single') {
+                btnSingle.className = "px-3 py-2 rounded-xl text-xs font-semibold border transition flex items-center justify-center space-x-2 bg-amber-500 text-slate-950 border-amber-400 shadow-lg shadow-amber-500/20";
+                btnMix.className = "px-3 py-2 rounded-xl text-xs font-semibold border border-slate-700 bg-slate-800 text-slate-300 hover:text-white transition flex items-center justify-center space-x-2";
+                
+                panelB.classList.add('hidden');
+                containerTarget.classList.remove('hidden');
+                outputSingle.classList.remove('hidden');
+                outputMix.classList.add('hidden');
+                labelRoleA.innerText = "(Objek Uji)";
+                row3dTempB.classList.add('hidden');
+                statusModeLabel.innerText = "Mode Pemanasan Benda";
+
+                if (meshObjB) meshObjB.visible = false;
+                if (beakerB) beakerB.visible = false;
+                if (bunsenFlame) bunsenFlame.visible = true;
+
+            } else {
+                btnMix.className = "px-3 py-2 rounded-xl text-xs font-semibold border transition flex items-center justify-center space-x-2 bg-cyan-500 text-slate-950 border-cyan-400 shadow-lg shadow-cyan-500/20";
+                btnSingle.className = "px-3 py-2 rounded-xl text-xs font-semibold border border-slate-700 bg-slate-800 text-slate-300 hover:text-white transition flex items-center justify-center space-x-2";
+                
+                panelB.classList.remove('hidden');
+                containerTarget.classList.add('hidden');
+                outputSingle.classList.add('hidden');
+                outputMix.classList.remove('hidden');
+                labelRoleA.innerText = "(Benda 1)";
+                row3dTempB.classList.remove('hidden');
+                statusModeLabel.innerText = "Mode Asas Black (Campuran)";
+
+                if (meshObjB) meshObjB.visible = true;
+                if (beakerB) beakerB.visible = true;
+                if (bunsenFlame) bunsenFlame.visible = false;
+            }
+
+            updatePhysicsCalculations();
+        }
+
+        // --- PRESETS HANDLER ---
+        function applyPreset(type) {
+            if (type === 'water_heat') {
+                setSimMode('single');
+                document.getElementById('mat-a').value = 'water';
+                document.getElementById('mass-a').value = 1.0;
+                document.getElementById('temp-a').value = 25;
+                document.getElementById('temp-a-target').value = 85;
+            } else if (type === 'mix_water') {
+                setSimMode('mix');
+                document.getElementById('mat-a').value = 'water';
+                document.getElementById('mass-a').value = 1.0;
+                document.getElementById('temp-a').value = 20;
+
+                document.getElementById('mat-b').value = 'water';
+                document.getElementById('mass-b').value = 0.5;
+                document.getElementById('temp-b').value = 90;
+            } else if (type === 'metal_water') {
+                setSimMode('mix');
+                document.getElementById('mat-a').value = 'water';
+                document.getElementById('mass-a').value = 1.5;
+                document.getElementById('temp-a').value = 25;
+
+                document.getElementById('mat-b').value = 'copper';
+                document.getElementById('mass-b').value = 0.8;
+                document.getElementById('temp-b').value = 95;
+            }
+            updatePhysicsCalculations();
+        }
+
+        // --- DATA LOGGER / TABLE MANAGEMENT ---
+        function recordCurrentStateToTable() {
+            tableRecordCount++;
+            const tbody = document.getElementById('data-table-body');
+            const tr = document.createElement('tr');
+            tr.className = "hover:bg-slate-800/40 transition";
+
+            const matAKey = document.getElementById('mat-a').value;
+            const massA = parseFloat(document.getElementById('mass-a').value);
+            const tempA = parseFloat(document.getElementById('temp-a').value);
+
+            if (simMode === 'single') {
+                const tempATarget = parseFloat(document.getElementById('temp-a-target').value);
+                const deltaT = tempATarget - tempA;
+                const cA = MATERIAL_SPECS[matAKey].c;
+                const Q_kj = (massA * cA * deltaT) / 1000;
+
+                tr.innerHTML = `
+                    <td class="px-2.5 py-2 text-slate-400">${tableRecordCount}</td>
+                    <td class="px-2.5 py-2 text-amber-400 font-sans font-medium">Pemanasan</td>
+                    <td class="px-2.5 py-2 text-slate-200">${MATERIAL_SPECS[matAKey].name}</td>
+                    <td class="px-2.5 py-2">${massA.toFixed(1)}</td>
+                    <td class="px-2.5 py-2">${tempA.toFixed(0)} °C</td>
+                    <td class="px-2.5 py-2 text-amber-300">ΔT = ${deltaT.toFixed(0)} °C</td>
+                    <td class="px-2.5 py-2 text-rose-400 font-bold">${Q_kj.toFixed(2)}</td>
+                    <td class="px-2 py-2 text-center no-print">
+                        <button onclick="this.closest('tr').remove()" class="text-slate-500 hover:text-rose-400 p-1">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+            } else {
+                const matBKey = document.getElementById('mat-b').value;
+                const massB = parseFloat(document.getElementById('mass-b').value);
+                const tempB = parseFloat(document.getElementById('temp-b').value);
+
+                const cA = MATERIAL_SPECS[matAKey].c;
+                const cB = MATERIAL_SPECS[matBKey].c;
+                const Tc = ((massA * cA * tempA) + (massB * cB * tempB)) / ((massA * cA) + (massB * cB));
+
+                let Q_val = 0;
+                if (tempA > tempB) Q_val = massA * cA * (tempA - Tc);
+                else Q_val = massB * cB * (tempB - Tc);
+
+                tr.innerHTML = `
+                    <td class="px-2.5 py-2 text-slate-400">${tableRecordCount}</td>
+                    <td class="px-2.5 py-2 text-cyan-400 font-sans font-medium">Asas Black</td>
+                    <td class="px-2.5 py-2 text-slate-200">${MATERIAL_SPECS[matAKey].name} + ${MATERIAL_SPECS[matBKey].name}</td>
+                    <td class="px-2.5 py-2">${massA.toFixed(1)} / ${massB.toFixed(1)}</td>
+                    <td class="px-2.5 py-2">${tempA.toFixed(0)} / ${tempB.toFixed(0)} °C</td>
+                    <td class="px-2.5 py-2 text-emerald-400 font-bold">Tc = ${Tc.toFixed(1)} °C</td>
+                    <td class="px-2.5 py-2 text-cyan-300 font-bold">${(Q_val/1000).toFixed(2)}</td>
+                    <td class="px-2 py-2 text-center no-print">
+                        <button onclick="this.closest('tr').remove()" class="text-slate-500 hover:text-rose-400 p-1">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+            }
+            tbody.appendChild(tr);
+        }
+
+        // Initial default observation rows
+        function populateInitialTableRows() {
+            applyPreset('water_heat'); recordCurrentStateToTable();
+            applyPreset('mix_water'); recordCurrentStateToTable();
+        }
+
+        // --- THREE.JS 3D SCENE & AR ENGINE ---
+        function initThreeJS() {
+            const container = document.getElementById('three-render-area');
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+
+            // Scene
+            scene = new THREE.Scene();
+
+            // Camera
+            camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+            camera.position.set(0, 3.5, 7.5);
+
+            // Renderer
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(width, height);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.shadowMap.enabled = true;
+            container.appendChild(renderer.domElement);
+
+            // OrbitControls
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.maxPolarAngle = Math.PI / 2 + 0.05;
+            controls.target.set(0, 1.2, 0);
+
+            // Lighting
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+            scene.add(ambientLight);
+
+            const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            dirLight.position.set(5, 10, 7);
+            dirLight.castShadow = true;
+            scene.add(dirLight);
+
+            const pointLight = new THREE.PointLight(0xf59e0b, 0.6, 10);
+            pointLight.position.set(0, 2, 2);
+            scene.add(pointLight);
+
+            // Build Physics Scene Models
+            buildPhysicsScene();
+
+            // Resize Event
+            window.addEventListener('resize', onWindowResize);
+
+            // Start Animation Loop
+            animate();
+        }
+
+        function buildPhysicsScene() {
+            // Lab Table Surface
+            const tableGeo = new THREE.CylinderGeometry(3.5, 3.7, 0.2, 32);
+            const tableMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.4, metalness: 0.2 });
+            const table = new THREE.Mesh(tableGeo, tableMat);
+            table.position.y = -0.1;
+            table.receiveShadow = true;
+            scene.add(table);
+
+            const grid = new THREE.GridHelper(6, 12, 0xf59e0b, 0x334155);
+            grid.position.y = 0.01;
+            scene.add(grid);
+
+            // GLASS MATERIAL FOR BEAKERS
+            const glassMat = new THREE.MeshPhysicalMaterial({
+                color: 0xffffff, transparent: true, opacity: 0.35, roughness: 0.1, transmission: 0.85, ior: 1.5, side: THREE.DoubleSide
+            });
+
+            // --- BEAKER A & OBJECT A ---
+            beakerA = new THREE.Group();
+            const bAGeo = new THREE.CylinderGeometry(1.0, 0.95, 2.2, 32, 1, true);
+            const bAMesh = new THREE.Mesh(bAGeo, glassMat);
+            bAMesh.position.y = 1.1;
+            beakerA.add(bAMesh);
+
+            // Content Object A (Cylinder liquid / block)
+            const objAGeo = new THREE.CylinderGeometry(0.9, 0.88, 1.6, 32);
+            const objAMat = new THREE.MeshStandardMaterial({ color: 0x10b981, transparent: true, opacity: 0.8, roughness: 0.3 });
+            meshObjA = new THREE.Mesh(objAGeo, objAMat);
+            meshObjA.position.y = 0.85;
+            beakerA.add(meshObjA);
+
+            beakerA.position.set(-1.2, 0, 0);
+            scene.add(beakerA);
+
+            // --- BEAKER B & OBJECT B ---
+            beakerB = new THREE.Group();
+            const bBGeo = new THREE.CylinderGeometry(0.85, 0.8, 1.9, 32, 1, true);
+            const bBMesh = new THREE.Mesh(bBGeo, glassMat);
+            bBMesh.position.y = 0.95;
+            beakerB.add(bBMesh);
+
+            // Content Object B
+            const objBGeo = new THREE.CylinderGeometry(0.75, 0.73, 1.3, 32);
+            const objBMat = new THREE.MeshStandardMaterial({ color: 0xef4444, transparent: true, opacity: 0.85, roughness: 0.3 });
+            meshObjB = new THREE.Mesh(objBGeo, objBMat);
+            meshObjB.position.y = 0.7,
+            beakerB.add(meshObjB);
+
+            beakerB.position.set(1.2, 0, 0);
+            scene.add(beakerB);
+
+            // --- BUNSEN BURNER (Single mode heating) ---
+            bunsenFlame = new THREE.Group();
+            const baseGeo = new THREE.CylinderGeometry(0.4, 0.5, 0.2, 16);
+            const baseMat = new THREE.MeshStandardMaterial({ color: 0x475569, metalness: 0.8 });
+            const baseMesh = new THREE.Mesh(baseGeo, baseMat);
+            baseMesh.position.y = 0.1;
+            bunsenFlame.add(baseMesh);
+
+            const flameGeo = new THREE.ConeGeometry(0.3, 0.8, 16);
+            const flameMat = new THREE.MeshBasicMaterial({ color: 0xf59e0b, transparent: true, opacity: 0.9 });
+            const flameMesh = new THREE.Mesh(flameGeo, flameMat);
+            flameMesh.position.y = 0.6;
+            bunsenFlame.add(flameMesh);
+
+            bunsenFlame.position.set(-1.2, 0, 0);
+            scene.add(bunsenFlame);
+
+            // --- STEAM PARTICLES ---
+            const pCount = 35;
+            const pGeo = new THREE.BufferGeometry();
+            const pPos = new Float32Array(pCount * 3);
+            for(let i=0; i<pCount*3; i+=3) {
+                pPos[i] = (Math.random() - 0.5) * 1.0 - 1.2;
+                pPos[i+1] = 1.8 + Math.random() * 1.2;
+                pPos[i+2] = (Math.random() - 0.5) * 1.0;
+            }
+            pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+            const pMat = new THREE.PointsMaterial({ color: 0xf8fafc, size: 0.08, transparent: true, opacity: 0 });
+            steamParticles = new THREE.Points(pGeo, pMat);
+            scene.add(steamParticles);
+        }
+
+        // Color interpolation helper for temperature scale
+        function getThermalColor(tempCelsius) {
+            // Cold (<15°C) = Blue #3B82F6
+            // Room (15°C - 35°C) = Green/Teal #10B981
+            // Warm (35°C - 70°C) = Amber #F59E0B
+            // Hot (>70°C) = Red/Rose #EF4444
+            const col = new THREE.Color();
+            if (tempCelsius < 15) {
+                col.setHex(0x3b82f6);
+            } else if (tempCelsius <= 35) {
+                col.setHex(0x10b981);
+            } else if (tempCelsius <= 70) {
+                col.setHex(0xf59e0b);
+            } else {
+                col.setHex(0xef4444);
+            }
+            return col;
+        }
+
+        function update3DVisuals() {
+            if (!meshObjA || !meshObjB) return;
+
+            const matAKey = document.getElementById('mat-a').value;
+            const tempA = parseFloat(document.getElementById('temp-a').value);
+            const tempATarget = parseFloat(document.getElementById('temp-a-target').value);
+            const massA = parseFloat(document.getElementById('mass-a').value);
+
+            const matBKey = document.getElementById('mat-b').value;
+            const tempB = parseFloat(document.getElementById('temp-b').value);
+            const massB = parseFloat(document.getElementById('mass-b').value);
+
+            if (simMode === 'single') {
+                // Scale height based on mass
+                meshObjA.scale.set(1, 0.5 + (massA * 0.15), 1);
+                
+                // Thermal Color based on target temperature
+                const colA = getThermalColor(tempATarget);
+                meshObjA.material.color.lerp(colA, 0.8);
+
+                // Steam effect
+                if (tempATarget > 50) {
+                    steamParticles.material.opacity = Math.min(0.8, (tempATarget - 50) / 50);
+                } else {
+                    steamParticles.material.opacity = 0;
+                }
+
+                document.getElementById('legend-color-a').innerText = tempATarget > 60 ? "Merah Panas" : "Hijau / Biru";
+                document.getElementById('legend-color-b').innerText = "- (Matikan)";
+
+            } else {
+                // Asas Black Mode
+                const cA = MATERIAL_SPECS[matAKey].c;
+                const cB = MATERIAL_SPECS[matBKey].c;
+                const Tc = ((massA * cA * tempA) + (massB * cB * tempB)) / ((massA * cA) + (massB * cB));
+
+                meshObjA.scale.set(1, 0.5 + (massA * 0.15), 1);
+                meshObjB.scale.set(1, 0.5 + (massB * 0.15), 1);
+
+                const colA = getThermalColor(Tc);
+                const colB = getThermalColor(Tc);
+
+                meshObjA.material.color.lerp(colA, 0.8);
+                meshObjB.material.color.lerp(colB, 0.8);
+
+                steamParticles.material.opacity = Tc > 50 ? 0.5 : 0;
+
+                document.getElementById('legend-color-a').innerText = `Setimbang (${Tc.toFixed(1)}°C)`;
+                document.getElementById('legend-color-b').innerText = `Setimbang (${Tc.toFixed(1)}°C)`;
+            }
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Animate Bunsen Flame flickering
+            if (bunsenFlame && bunsenFlame.visible) {
+                bunsenFlame.children[1].scale.y = 0.9 + Math.sin(Date.now() * 0.01) * 0.15;
+            }
+
+            // Animate Steam Particles
+            if (steamParticles && steamParticles.material.opacity > 0) {
+                const pos = steamParticles.geometry.attributes.position.array;
+                for (let i = 1; i < pos.length; i += 3) {
+                    pos[i] += 0.012;
+                    if (pos[i] > 3.0) pos[i] = 1.8;
+                }
+                steamParticles.geometry.attributes.position.needsUpdate = true;
+            }
+
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        function onWindowResize() {
+            const container = document.getElementById('three-render-area');
+            if (!container) return;
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+
+            camera.aspect = width / height;
+            camera.updateProjectionMatrix();
+            renderer.setSize(width, height);
+        }
+
+        // --- WEBAR CAMERA SWITCHER ---
+        async function switch3DViewMode(mode) {
+            currentViewMode = mode;
+            const btn3d = document.getElementById('btn-view-3d');
+            const btnAr = document.getElementById('btn-view-ar');
+            const videoElem = document.getElementById('ar-camera-feed');
+            const banner = document.getElementById('ar-guide-banner');
+
+            if (mode === 'ar') {
+                btnAr.className = "px-3 py-1 rounded-md text-xs font-semibold bg-amber-500 text-slate-950 shadow transition";
+                btn3d.className = "px-3 py-1 rounded-md text-xs font-medium text-slate-400 hover:text-slate-200 transition";
+
+                try {
+                    cameraStream = await navigator.mediaDevices.getUserMedia({
+                        video: { facingMode: 'environment' }
+                    });
+                    videoElem.srcObject = cameraStream;
+                    videoElem.classList.remove('hidden');
+                    banner.classList.remove('hidden');
+                    
+                    renderer.setClearColor(0x000000, 0);
+                } catch (err) {
+                    console.warn("WebAR Camera Access Failed:", err);
+                    alert("Kamera tidak dapat diakses atau izin ditolak. Mengembalikan ke Mode 3D Viewer.");
+                    switch3DViewMode('3d');
+                }
+            } else {
+                btn3d.className = "px-3 py-1 rounded-md text-xs font-semibold bg-amber-500 text-slate-950 shadow transition";
+                btnAr.className = "px-3 py-1 rounded-md text-xs font-medium text-slate-400 hover:text-slate-200 transition";
+
+                if (cameraStream) {
+                    cameraStream.getTracks().forEach(track => track.stop());
+                    cameraStream = null;
+                }
+                videoElem.classList.add('hidden');
+                banner.classList.add('hidden');
+
+                renderer.setClearColor(0x0f172a, 0);
+            }
+        }
+
+        // --- INITIALIZATION ---
+        window.onload = function() {
+            initThreeJS();
+            updatePhysicsCalculations();
+            populateInitialTableRows();
+        };
+    </script>
+</body>
+</html>
